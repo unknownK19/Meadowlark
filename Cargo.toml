@@ -13,4 +13,4 @@ codegen-units = 8
 opt-level = 1
 
 [dependencies]
-iced = {version="0.12.1", features =[ "canvas", "tokio", "debug"]}
+iced = {version="0.12.1", features =[ "canvas", "tokio", "debug", "svg"]}
