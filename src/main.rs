@@ -69,7 +69,7 @@ impl Application for Usernaut {
                 thememode: Theme::CatppuccinFrappe,
             },
             Command::batch(vec![font::load(
-                include_bytes!("../Assets/Font//DaddyTimeMonoNerdFont-Regular.ttf").as_slice(),
+                include_bytes!("../Assets/Font/DaddyTimeMonoNerdFont-Regular.ttf").as_slice(),
             )
             .map(Message::Fontload)]),
         )
