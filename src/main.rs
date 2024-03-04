@@ -1,9 +1,11 @@
+mod style;
 mod tools; // TODO Every Event Action to System Reaction
 
 use std::time::Duration;
+use style::DefaultButton;
 
 use iced::theme;
-use iced::widget::button;
+use iced::widget::Button;
 use iced::{
     executor,
     font,
@@ -19,7 +21,7 @@ use iced::{
     Theme,
 };
 
-struct Usernaut {
+pub struct Usernaut {
     // Every User is Astronaut! they want to Explore 😃
     //name: String,
     width: f32,
@@ -28,7 +30,7 @@ struct Usernaut {
 }
 
 #[derive(Debug, Clone)]
-enum Message {
+pub enum Message {
     Animate,                           // Animation action
     Clickaction(u8),                   // click action
     Fontload(Result<(), font::Error>), // Font Load
@@ -123,21 +125,29 @@ impl Application for Usernaut {
         .height(Length::Shrink)
         .style(theme::Svg::Default);
 
+        let button01 = |x| {
+            Button::new(x)
+                .width(Length::Shrink)
+                .style(theme::Button::Custom(Box::new(DefaultButton(
+                    self.thememode.palette(),
+                ))))
+        };
+
         column![
             // top bar
             row![
                 //action bar
                 row![
                     // Width
-                    button("Width")
+                    button01("Width")
                         .width(Length::Fixed(self.width))
                         .on_press(Message::Clickaction(1)),
                     // Nord Theme
-                    button("Nord")
+                    button01("Nord")
                         .width(Length::Shrink)
                         .on_press(Message::ChangeTheme(Theme::Nord)),
                     // TokyoNight Theme
-                    button("TokyoNight")
+                    button01("TokyoNight")
                         .width(Length::Shrink)
                         .on_press(Message::ChangeTheme(Theme::TokyoNight)),
                 ]
