@@ -5,18 +5,12 @@ use std::time::Duration;
 use iced::theme;
 use iced::widget::button;
 use iced::{
-    border::Radius,
     executor,
     font,
     //theme::Palette,
-    widget::{
-        button::{Appearance, StyleSheet},
-        column, row,
-    },
+    widget::{column, row, svg},
     window,
     Application,
-    Border,
-    Color,
     Command,
     Font,
     Length,
@@ -38,6 +32,7 @@ enum Message {
     Animate,                           // Animation action
     Clickaction(u8),                   // click action
     Fontload(Result<(), font::Error>), // Font Load
+    ChangeTheme(Theme),
 }
 
 fn main() -> iced::Result {
@@ -72,13 +67,13 @@ impl Application for Usernaut {
                 thememode: Theme::CatppuccinFrappe,
             },
             Command::batch(vec![font::load(
-                include_bytes!("../Assets/DaddyTimeMonoNerdFont-Regular.ttf").as_slice(),
+                include_bytes!("../Assets/Font//DaddyTimeMonoNerdFont-Regular.ttf").as_slice(),
             )
             .map(Message::Fontload)]),
         )
     }
     fn title(&self) -> String {
-        "MarkDown Carbide".to_string()
+        "Meadowlark".to_string()
     }
     fn update(&mut self, message: Self::Message) -> Command<Self::Message> {
         match message {
@@ -102,6 +97,7 @@ impl Application for Usernaut {
                     self.animmode[0] = true
                 }
             }
+            Message::ChangeTheme(x) => self.thememode = x,
             _ => {}
         }
         Command::none()
@@ -110,23 +106,49 @@ impl Application for Usernaut {
         iced::time::every(Duration::from_millis(16)).map(|_| Message::Animate)
     }
     fn view(&self) -> iced::Element<'_, Self::Message, Self::Theme, iced::Renderer> {
-        // What we view.
+        // What we view. currently this is just test.
+        let file_open = svg(svg::Handle::from_path(format!(
+            "{}/Assets/theme/icons/Default-Light/file_open.svg",
+            env!("CARGO_MANIFEST_DIR")
+        )))
+        .width(Length::Shrink)
+        .height(Length::Shrink)
+        .style(theme::Svg::Default);
+
+        let file_save = svg(svg::Handle::from_path(format!(
+            "{}/Assets/theme/icons/Default-Light/file_save.svg",
+            env!("CARGO_MANIFEST_DIR")
+        )))
+        .width(Length::Shrink)
+        .height(Length::Shrink)
+        .style(theme::Svg::Default);
+
         column![
             // top bar
             row![
                 //action bar
                 row![
-                    // File
-                    button("File")
+                    // Width
+                    button("Width")
                         .width(Length::Fixed(self.width))
-                        .on_press(Message::Clickaction(1))
-                        .style(theme::Button::Destructive),
-                    // Edit
-                    button("Edit").width(Length::Fill)
+                        .on_press(Message::Clickaction(1)),
+                    // Nord Theme
+                    button("Nord")
+                        .width(Length::Shrink)
+                        .on_press(Message::ChangeTheme(Theme::Nord)),
+                    // TokyoNight Theme
+                    button("TokyoNight")
+                        .width(Length::Shrink)
+                        .on_press(Message::ChangeTheme(Theme::TokyoNight)),
                 ]
+                .spacing(4)
                 .padding(10)
                 .align_items(iced::Alignment::Center)
             ],
+            row![file_open, file_save] // Alternately add list view
+
+                                       // Add Pane Grid
+                                       //PaneGrid::new(&state, view)
         ]
         .into()
     }
@@ -147,22 +169,5 @@ impl Application for Usernaut {
         //         danger: Color::from_rgb8(246, 193, 119),
         //     },
         // )
-    }
-}
-
-// TODO Customize Widget
-struct Buttonstyle;
-
-impl StyleSheet for Buttonstyle {
-    type Style = ();
-    fn active(&self, _style: &Self::Style) -> button::Appearance {
-        Appearance {
-            border: Border {
-                color: Color::from_rgb8(5, 222, 222),
-                width: 2.0,
-                radius: Radius::default(),
-            },
-            ..Default::default()
-        }
     }
 }
