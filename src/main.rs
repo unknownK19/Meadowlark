@@ -1,6 +1,7 @@
 mod style;
 mod tools; // TODO Every Event Action to System Reaction
 
+use std::f32::consts::PI;
 use std::time::Duration;
 use style::DefaultButton;
 
@@ -21,6 +22,10 @@ use iced::{
     Theme,
 };
 
+//#![allow(unused_variables)]
+#[allow(dead_code)]
+const ANIMATIONSPEED: f32 = 2.0; //unit second
+
 pub struct Usernaut {
     // Every User is Astronaut! they want to Explore 😃
     //name: String,
@@ -29,10 +34,39 @@ pub struct Usernaut {
     thememode: Theme,
 }
 
+/// Linear => slope tan f32 , delta change f32
+#[allow(dead_code)]
+#[derive(PartialEq)]
+enum ChangeFn {
+    Linear(f32, f32),
+    // TODO Add another two function
+    // Quadratic
+    // Sine
+}
+
+#[allow(dead_code)]
+#[allow(unused_variables)]
+impl ChangeFn {
+    pub fn change(self, mut x: f32, y: f32) -> f32 {
+        match self {
+            Self::Linear(theta, delta) => {
+                if theta != 0.0
+                    && (x - y).abs() >= x * delta * theta.atan()
+                    && x != y
+                    && theta != PI / 2.0
+                {
+                    x = x + theta.tan() * delta;
+                }
+            }
+        }
+        x
+    }
+}
+
 #[derive(Debug, Clone)]
 pub enum Message {
     Animate,                           // Animation action
-    Clickaction(u8),                   // click action
+    Clickaction(usize),                // click action
     Fontload(Result<(), font::Error>), // Font Load
     ChangeTheme(Theme),
 }
@@ -50,7 +84,7 @@ fn main() -> iced::Result {
             ..Default::default()
         },
         antialiasing: true,
-        default_font: Font::with_name("DaddyTimeMono Nerd Font"),
+        default_font: Font::with_name("Nova Square"),
         ..Default::default()
     })
 }
@@ -64,14 +98,18 @@ impl Application for Usernaut {
         (
             Self {
                 //name: "user".to_string(),
-                width: 55.,
+                width: 70.,
                 animmode: vec![false],
                 thememode: Theme::CatppuccinFrappe,
             },
-            Command::batch(vec![font::load(
-                include_bytes!("../Assets/Font/DaddyTimeMonoNerdFont-Regular.ttf").as_slice(),
-            )
-            .map(Message::Fontload)]),
+            Command::batch(vec![
+                font::load(
+                    include_bytes!("../Assets/Font/DaddyTimeMonoNerdFont-Regular.ttf").as_slice(),
+                )
+                .map(Message::Fontload),
+                font::load(include_bytes!("../Assets/Font/NovaSquare-Regular.ttf").as_slice())
+                    .map(Message::Fontload),
+            ]),
         )
     }
     fn title(&self) -> String {
@@ -81,24 +119,31 @@ impl Application for Usernaut {
         match message {
             Message::Animate => {
                 if self.animmode[0] {
-                    if self.width <= 80. {
-                        self.width += (80. / self.width).sin();
-                    } else {
-                    }
+                    self.width = ChangeFn::Linear(PI / 2.2, 0.1).change(self.width, 90.0);
                 } else {
-                    if self.width >= 55. {
-                        self.width -= (55. / self.width).sin();
-                    } else {
-                    }
+                    self.width = ChangeFn::Linear(-PI / 2.2, 0.1).change(self.width, 70.0);
+                }
+                // if self.animmode[0] {
+                //     if self.width <= 90. {
+                //         self.width += (90. / self.width).sin();
+                //     } else {
+                //     }
+                // } else {
+                //     if self.width >= 70. {
+                //         self.width -= (70. / self.width).sin();
+                //     } else {
+                //     }
+                // }
+            }
+
+            Message::Clickaction(i) => {
+                if self.animmode[i - 1] {
+                    self.animmode[i - 1] = false
+                } else {
+                    self.animmode[i - 1] = true
                 }
             }
-            Message::Clickaction(1) => {
-                if self.animmode[0] {
-                    self.animmode[0] = false
-                } else {
-                    self.animmode[0] = true
-                }
-            }
+
             Message::ChangeTheme(x) => self.thememode = x,
             _ => {}
         }
@@ -130,7 +175,9 @@ impl Application for Usernaut {
                 .width(Length::Shrink)
                 .style(theme::Button::Custom(Box::new(DefaultButton(
                     self.thememode.palette(),
+                    Message::Clickaction(2),
                 ))))
+                .padding(10.0)
         };
 
         column![
