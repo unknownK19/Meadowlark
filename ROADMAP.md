@@ -26,7 +26,7 @@ Level 2 (Intermediate)
 1. VST support which is available in [iced_audio](https://github.com/iced-rs/iced_audio)
    * .. TODO
    
-2. External Paino and other instrument Support using (This link)[https://rust.audio/]
+2. External Paino and other instrument Support using [This link](https://rust.audio/)
    * ..TODO
 
 3. Callaboration Mode
