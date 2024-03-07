@@ -31,3 +31,6 @@ Level 2 (Intermediate)
 
 3. Callaboration Mode
    * ..TODO
+
+4. Magic Pad (Android Tab and IPAD as a musical instrument)
+   * ..TODO
