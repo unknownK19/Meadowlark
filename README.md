@@ -9,6 +9,11 @@ This Repository is midnight moon AKA Nightly
 
 This will written in Rust with Iced-rs for all platform, also for Android and IOS for external action such as Lauchpad (Android Tab or iPAD)
 
+
+<a href="https://github.com/iced-rs/iced">
+  <img src="https://gist.githubusercontent.com/hecrj/ad7ecd38f6e47ff3688a38c79fd108f0/raw/74384875ecbad02ae2a926425e9bcafd0695bade/color.svg" width="260px">
+</a>
+
 ## Get Involved
 
 Before participating in discussions with the community, you should familiarize yourself with our [Code of Conduct].
