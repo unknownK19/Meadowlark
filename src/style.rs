@@ -1,4 +1,4 @@
-// TODO Customize More Layout
+// TODO Customize Layout
 
 use iced::{
     border::Radius,
@@ -9,7 +9,7 @@ use iced::{
 
 use crate::Message;
 
-pub struct DefaultButton(pub Palette, pub Message);
+pub struct DefaultButton(pub Palette, pub Message, pub Colorkey);
 
 impl button::StyleSheet for DefaultButton {
     type Style = Theme;
@@ -25,8 +25,8 @@ impl button::StyleSheet for DefaultButton {
         }
     }
     fn hovered(&self, style: &Self::Style) -> Appearance {
-        Message::Clickaction(2);
-        println!("Hovered me");
+        Message::Hoveraction(1);
+        // println!("Hovered me");
         button::Appearance {
             background: Some(Background::Color(Color {
                 a: 1.0,
@@ -49,6 +49,47 @@ impl button::StyleSheet for DefaultButton {
     fn pressed(&self, style: &Self::Style) -> Appearance {
         button::Appearance {
             ..self.active(style)
+        }
+    }
+}
+
+#[allow(dead_code)]
+/// initial <-> now <-> final
+#[derive(Clone, Copy)]
+pub enum Colorkey {
+    R(f32, f32, f32),
+    G(f32, f32, f32),
+    B(f32, f32, f32),
+    A(f32, f32, f32),
+}
+
+#[allow(dead_code)]
+/// initial <-> now <-> final
+#[derive(Clone, Copy)]
+pub enum Dimensionkey {
+    Height(f32, f32, f32),
+    Width(f32, f32, f32),
+    BRadius(f32, f32, f32),
+}
+
+#[allow(dead_code)]
+pub struct AnimationStyle {
+    pub color: Vec<Colorkey>,
+    pub dimension: Vec<Dimensionkey>,
+}
+impl AnimationStyle {
+    pub fn get_width(&self, index: usize) -> f32 {
+        match self.dimension[index] {
+            Dimensionkey::Width(_, n, _) => n,
+            _ => 0.0,
+        }
+    }
+    pub fn get_color(&self, index: usize) -> Colorkey {
+        match self.color[index] {
+            Colorkey::A(x, y, z) => Colorkey::A(x, y, z),
+            Colorkey::R(x, y, z) => Colorkey::R(x, y, z),
+            Colorkey::G(x, y, z) => Colorkey::G(x, y, z),
+            Colorkey::B(x, y, z) => Colorkey::B(x, y, z),
         }
     }
 }
