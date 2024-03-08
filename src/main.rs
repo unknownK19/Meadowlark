@@ -3,7 +3,7 @@ mod tools; // TODO Every Event Action to System Reaction
 
 use std::f32::consts::PI;
 use std::time::Duration;
-use style::DefaultButton;
+use style::{AnimationStyle, Colorkey, DefaultButton, Dimensionkey};
 
 use iced::theme;
 use iced::widget::Button;
@@ -23,13 +23,13 @@ use iced::{
 };
 
 //#![allow(unused_variables)]
-#[allow(dead_code)]
-const ANIMATIONSPEED: f32 = 2.0; //unit second
+// #[allow(dead_code)]
+// const ANIMATIONSPEED: f32 = 2.0; //unit second
 
 pub struct Usernaut {
     // Every User is Astronaut! they want to Explore 😃
     //name: String,
-    width: f32,
+    animatestyle: AnimationStyle,
     animmode: Vec<bool>,
     thememode: Theme,
 }
@@ -68,7 +68,8 @@ pub enum Message {
     Animate,                           // Animation action
     Clickaction(usize),                // click action
     Fontload(Result<(), font::Error>), // Font Load
-    ChangeTheme(Theme),
+    //ChangeTheme(Theme),                //TODO: Theme changeble as settings (user config)
+    Hoveraction(usize), // Hoveraction
 }
 
 fn main() -> iced::Result {
@@ -98,8 +99,11 @@ impl Application for Usernaut {
         (
             Self {
                 //name: "user".to_string(),
-                width: 70.,
-                animmode: vec![false],
+                animatestyle: AnimationStyle {
+                    color: [Colorkey::A(1.0, 1.0, 0.0); 4].to_vec(),
+                    dimension: [Dimensionkey::Width(70.0, 70.0, 90.0); 4].to_vec(),
+                },
+                animmode: [false; 4].to_vec(),
                 thememode: Theme::CatppuccinFrappe,
             },
             Command::batch(vec![
@@ -118,22 +122,23 @@ impl Application for Usernaut {
     fn update(&mut self, message: Self::Message) -> Command<Self::Message> {
         match message {
             Message::Animate => {
-                if self.animmode[0] {
-                    self.width = ChangeFn::Linear(PI / 2.2, 0.1).change(self.width, 90.0);
-                } else {
-                    self.width = ChangeFn::Linear(-PI / 2.2, 0.1).change(self.width, 70.0);
+                for index in 0..=2 {
+                    //let index = 0;
+                    if let Colorkey::A(i, ref mut n, f) = self.animatestyle.color[index] {
+                        match self.animmode[index] {
+                            true => *n = ChangeFn::Linear(PI / 2.2, 0.1).change(*n, f),
+                            false => *n = ChangeFn::Linear(PI / 2.2, 0.1).change(*n, i),
+                        }
+                    }
+
+                    if let Dimensionkey::Width(i, ref mut n, f) = self.animatestyle.dimension[index]
+                    {
+                        match self.animmode[index] {
+                            true => *n = ChangeFn::Linear(PI / 2.2, 0.1).change(*n, f),
+                            false => *n = ChangeFn::Linear(-PI / 2.2, 0.1).change(*n, i),
+                        }
+                    }
                 }
-                // if self.animmode[0] {
-                //     if self.width <= 90. {
-                //         self.width += (90. / self.width).sin();
-                //     } else {
-                //     }
-                // } else {
-                //     if self.width >= 70. {
-                //         self.width -= (70. / self.width).sin();
-                //     } else {
-                //     }
-                // }
             }
 
             Message::Clickaction(i) => {
@@ -142,9 +147,12 @@ impl Application for Usernaut {
                 } else {
                     self.animmode[i - 1] = true
                 }
+                match i {
+                    2 => self.thememode = Theme::Nord,
+                    3 => self.thememode = Theme::TokyoNight,
+                    _ => {}
+                }
             }
-
-            Message::ChangeTheme(x) => self.thememode = x,
             _ => {}
         }
         Command::none()
@@ -175,7 +183,8 @@ impl Application for Usernaut {
                 .width(Length::Shrink)
                 .style(theme::Button::Custom(Box::new(DefaultButton(
                     self.thememode.palette(),
-                    Message::Clickaction(2),
+                    Message::Clickaction(1),
+                    self.animatestyle.get_color(0),
                 ))))
                 .padding(10.0)
         };
@@ -187,24 +196,22 @@ impl Application for Usernaut {
                 row![
                     // Width
                     button01("Width")
-                        .width(Length::Fixed(self.width))
+                        .width(Length::Fixed(self.animatestyle.get_width(0)))
                         .on_press(Message::Clickaction(1)),
                     // Nord Theme
                     button01("Nord")
-                        .width(Length::Shrink)
-                        .on_press(Message::ChangeTheme(Theme::Nord)),
+                        .width(Length::Fixed(self.animatestyle.get_width(1)))
+                        .on_press(Message::Clickaction(2)),
                     // TokyoNight Theme
-                    button01("TokyoNight")
-                        .width(Length::Shrink)
-                        .on_press(Message::ChangeTheme(Theme::TokyoNight)),
+                    button01("TN")
+                        .width(Length::Fixed(self.animatestyle.get_width(2)))
+                        .on_press(Message::Clickaction(3)),
                 ]
                 .spacing(4)
                 .padding(10)
                 .align_items(iced::Alignment::Center)
             ],
-            row![file_open, file_save] // Alternately add list view
-
-                                       // Add Pane Grid
+            row![file_open, file_save] // TODO Add Pane Grid
                                        //PaneGrid::new(&state, view)
         ]
         .into()
