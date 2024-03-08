@@ -2,7 +2,7 @@ Level 1 (Beginning)
 
 1. Design and Layout 
     - [ ] Windows styles
-   >Pan Grid is possible [iced::widget::pane_grid](https://docs.rs/iced/latest/iced/widget/pane_grid/index.html)
+   >Pane Grid is possible [iced::widget::pane_grid](https://docs.rs/iced/latest/iced/widget/pane_grid/index.html)
     - [ ] Smooth Animation 
     - [ ] Custom Widget like knob, slider, .. 
     - [ ] Intro dash splash 
